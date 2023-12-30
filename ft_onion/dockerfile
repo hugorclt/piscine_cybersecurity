@@ -1,0 +1,29 @@
+# Use Debian as the base image
+FROM debian:latest
+
+# Update packages and install necessary
+RUN apt-get update && apt-get install -y nginx curl tor systemctl openssh-server
+
+# Expose port 80 to allow external access
+EXPOSE 80
+
+# Expose port 4242 for ssh
+EXPOSE 4242
+
+# Copy website src
+COPY index.html /var/www/html
+
+# Remove the default Nginx configuration
+RUN rm /etc/nginx/sites-enabled/default
+
+# Create ssh directory
+RUN mkdir -p /var/run/sshd
+RUN echo 'root:passwd' | chpasswd
+
+# COPY CONF FILE
+COPY nginx.conf /etc/nginx/sites-enabled/nginx.conf
+COPY torrc /etc/tor/torrc
+COPY startup.sh /startup.sh
+COPY sshd_config /etc/ssh/sshd_config
+
+CMD ["sh", "startup.sh"]
