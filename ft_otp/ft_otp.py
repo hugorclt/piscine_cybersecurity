@@ -4,11 +4,9 @@ import hmac
 import base64;
 import datetime
 import time
-
-class otp:
-    def __init__(self, argv):
-        return ;
-
+from cryptography.fernet import Fernet
+import base64
+    
 def init_args():
     parser = argparse.ArgumentParser(
                     prog='ft_otp',
@@ -21,20 +19,24 @@ def init_args():
     return args
 
 def check_generate(args):
-    try:
-        with open(args.generate, "r") as f:
-            byte = f.read()
-            isHex = all(c in string.hexdigits for c in byte)
-            if (not isHex):
-                print("The key is not in hexadecimal")
-                exit(1)
-            if (len(byte) != 64):
-                print("The key is not 64 character long")
-                exit(1)
-            return byte
-    except:
-        print("Invalid path:", args.generate)
-        exit(1)
+    with open(args.generate, "r") as f:
+        byte = f.read()
+        isHex = all(c in string.hexdigits for c in byte)
+        if (not isHex):
+            print("The key is not in hexadecimal")
+            exit(1)
+        if (len(byte) != 64):
+            print("The key is not 64 character long")
+            exit(1)
+        with open("./hash.key", "w+b") as f:
+            key = f.read()
+            print(key)
+            if (key.decode('utf-8') == ""):
+                key = Fernet.generate_key()
+                f.write(key);
+            fernet = Fernet(key)
+            hash = fernet.encrypt(byte.encode())
+            return hash
 
 
 def low_order_4_bits(val):
@@ -72,13 +74,17 @@ def exec():
     args = init_args()
     if (args.generate is not None):
         key = check_generate(args)
-        file = open('ft_otp.key', 'w')
+        file = open('ft_otp.key', 'wb')
         file.write(key)
     elif (args.key is not None):
         file = open(args.key, 'r')
-        key = file.read()
-        code = totp(key)
-        print(code)
+        key_hash = file.read()
+        with open("hash.key", "r") as f:
+            master_key = f.read()
+            fernet = Fernet(master_key)
+            key = fernet.decrypt(key_hash).decode()
+            code = totp(key)
+            print(code)
 
 if __name__ == '__main__':
     exec()
