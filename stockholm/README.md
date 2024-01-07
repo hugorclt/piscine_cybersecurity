@@ -1,6 +1,6 @@
 # Stockholm Program Overview
 
-This educational project, "Stockholm," operates within a Linux environment and follows specific guidelines:
+This project, "Stockholm" is developed within a Linux environment, designed for educational purposes to simulate ransomware functionalities for learning and understanding cybersecurity measures.
 
 ## Program Specifications
 - **Platform:** Linux
