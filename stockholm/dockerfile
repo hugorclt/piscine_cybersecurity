@@ -1,13 +1,12 @@
-# Use Debian as the base image
-FROM debian:latest
-
-# Update packages and install necessary
-RUN apt-get update && apt-get install -y gcc python3
-
-RUN pip3 install cryptography
+FROM python:3
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir cryptography pyAesCrypt
 
 RUN mkdir /app
+RUN mkdir /root/infection
+COPY ./infection /root/infection
 
 COPY main.py /app/main.py
+COPY supported_extensions /app/supported_extensions
 
 CMD ["tail", "-f"]
