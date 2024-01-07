@@ -1,0 +1,13 @@
+# Use Debian as the base image
+FROM debian:latest
+
+# Update packages and install necessary
+RUN apt-get update && apt-get install -y gcc python3
+
+RUN pip3 install cryptography
+
+RUN mkdir /app
+
+COPY main.py /app/main.py
+
+CMD ["tail", "-f"]
