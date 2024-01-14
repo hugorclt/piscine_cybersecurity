@@ -3,4 +3,10 @@ FROM python:3
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir cryptography scapy
 
+RUN apt update && apt install iproute2 tcpdump iputils-ping net-tools -y
+
+RUN mkdir /app
+
+COPY ./main.py /app
+
 CMD ["tail", "-f"]

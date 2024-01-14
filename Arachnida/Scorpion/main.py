@@ -14,21 +14,24 @@ class Scorpion:
 
     def _parse_exif(self, url):
         try:
-            image_http_res = requests.get(url)
-            img = Image.open(BytesIO(image_http_res.content))
+            img = Image.open(url)
             exif_data = img._getexif()
             img.close()
-            self._display_exif_data(exif_data)
+            self._display_exif_data(exif_data, url)
         except:
             print("An error occured during the request, wrong url?")
 
             
-    def _display_exif_data(self, exif_info):
+    def _display_exif_data(self, exif_info, url):
+        print(f'IMAGE: {url[url.find("/") + 1:]}\n\n-------------------')
         if exif_info is not None:
             for tag, value in exif_info.items():
-                print(f'Tag: {TAGS[tag]}, Value: {value}')
+                if (isinstance(value, bytes)):
+                    value = value.decode('utf-8', errors='ignore')
+                print(f'{TAGS[tag]}: {value}')
         else:
             print('Aucune donnée EXIF trouvée.')
+        print('-------------------\n\t****\n')
 
     def launch(self):
         for url in self.image_url:

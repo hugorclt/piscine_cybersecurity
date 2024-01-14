@@ -30,7 +30,6 @@ def check_generate(args):
             exit(1)
         with open("./hash.key", "w+b") as f:
             key = f.read()
-            print(key)
             if (key.decode('utf-8') == ""):
                 key = Fernet.generate_key()
                 f.write(key);

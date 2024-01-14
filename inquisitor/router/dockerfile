@@ -1,5 +1,0 @@
-FROM debian:buster
-
-RUN apt-get update
-
-CMD ["tail", "-f"]

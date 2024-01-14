@@ -14,13 +14,6 @@ services:
       context: ./client
     networks:
       - inquisitor
-
-  router:
-    container_name: router
-    build:
-      context: ./router
-    networks:
-      - inquisitor
   
 networks:
   inquisitor:
