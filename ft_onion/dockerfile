@@ -13,9 +13,6 @@ EXPOSE 4242
 # Copy website src
 COPY index.html /var/www/html
 
-# Remove the default Nginx configuration
-RUN rm /etc/nginx/sites-enabled/default
-
 # Create ssh directory
 RUN mkdir -p /var/run/sshd
 RUN echo 'root:passwd' | chpasswd

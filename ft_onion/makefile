@@ -2,7 +2,7 @@ build:
 	docker build -t onion .
 
 up:
-	docker run -d -p 8080:80 -p 4242:4242 onion
+	docker run -d -p 80:80 -p 4242:4242 onion
 
 start:
 	make build

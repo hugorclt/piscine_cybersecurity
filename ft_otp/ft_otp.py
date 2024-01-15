@@ -6,6 +6,7 @@ import datetime
 import time
 from cryptography.fernet import Fernet
 import base64
+import pyotp
     
 def init_args():
     parser = argparse.ArgumentParser(
@@ -58,7 +59,7 @@ def DT(hash_string):
 
 def hotp(key, code):
     counter_bytes = code.to_bytes(8, byteorder='big')
-    hs_hmac = hmac.new(key.encode('utf-8'), counter_bytes, "sha1")
+    hs_hmac = hmac.new(key, counter_bytes, "sha1")
     hs = hs_hmac.digest()
     s_bits = DT(hs)
     s_num = int(s_bits.hex(), 16)
@@ -81,9 +82,11 @@ def exec():
         with open("hash.key", "r") as f:
             master_key = f.read()
             fernet = Fernet(master_key)
-            key = fernet.decrypt(key_hash).decode()
-            code = totp(key)
-            print(code)
+            key = base64.b32encode(fernet.decrypt(key_hash))
+            code = totp(base64.b32decode(key))
+            true_otp = pyotp.TOTP(key).now()
+            print("True OTP:", true_otp)
+            print("Ft_OTP:", str(code).zfill(6))
 
 if __name__ == '__main__':
     exec()
